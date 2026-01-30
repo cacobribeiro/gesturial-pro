@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum CategoryGroup {
+  CASA
+  ALIMENTACAO
+  TRANSPORTE_CARRO
+  CRIANCAS_ESCOLA
+  LAZER_ENTRETENIMENTO
+  ASSINATURAS
+  PROFISSIONAL
+  SAUDE
+  OUTROS
+}
+
+enum AssetType {
+  STOCK
+  FII
+  CRYPTO
+  FIXED_INCOME
+  OTHER
+}
+
+enum InvestmentMovementType {
+  BUY
+  SELL
+  DIVIDEND
+}
+
+model User {
+  id           String       @id @default(uuid())
+  username     String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  categories   Category[]
+  transactions Transaction[]
+  assets       InvestmentAsset[]
+  movements    InvestmentMovement[]
+}
+
+model Category {
+  id         String       @id @default(uuid())
+  userId     String?
+  user       User?        @relation(fields: [userId], references: [id])
+  name       String
+  group      CategoryGroup
+  icon       String
+  isActive   Boolean      @default(true)
+  createdAt  DateTime     @default(now())
+  transactions Transaction[]
+
+  @@unique([name, userId])
+}
+
+model Transaction {
+  id         String          @id @default(uuid())
+  userId     String
+  user       User            @relation(fields: [userId], references: [id])
+  type       TransactionType
+  amount     Decimal         @db.Decimal(14, 2)
+  date       DateTime
+  categoryId String
+  category   Category        @relation(fields: [categoryId], references: [id])
+  note       String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model InvestmentAsset {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  symbolOrName String
+  assetType   AssetType
+  quantity    Decimal  @db.Decimal(18, 4)
+  avgPrice    Decimal  @db.Decimal(18, 4)
+  createdAt   DateTime @default(now())
+  movements   InvestmentMovement[]
+}
+
+model InvestmentMovement {
+  id       String   @id @default(uuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  assetId  String
+  asset    InvestmentAsset @relation(fields: [assetId], references: [id])
+  type     InvestmentMovementType
+  quantity Decimal @db.Decimal(18, 4)
+  price    Decimal @db.Decimal(18, 4)
+  date     DateTime
+  createdAt DateTime @default(now())
+}
