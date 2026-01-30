@@ -34,10 +34,12 @@ Web app mobile-first estilo iOS para gestão de gastos/receitas mensais e cartei
 - Node.js 20+
 - pnpm 9+
 - PostgreSQL local
+- Corepack habilitado
 
 ### Instalação
 
 ```bash
+corepack enable
 pnpm install
 ```
 
@@ -85,13 +87,21 @@ pnpm test:coverage
 ### Web (Vercel)
 
 - Configure `NEXT_PUBLIC_API_URL` no painel da Vercel.
-- Build command: `pnpm install && pnpm --filter @gesturial/web build`
+- Install command: `corepack enable && pnpm install --frozen-lockfile`
+- Build command: `pnpm --filter @gesturial/web build`
 - Output: `.next`
 
 ### API (Render)
 
 - Use o blueprint `render.yaml`.
 - Configure `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`.
+- Build command sugerido: `corepack enable && corepack prepare pnpm@9.12.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @gesturial/api build`
+- Start command sugerido: `node apps/api/dist/index.js`
+
+## 🧹 Notas de tooling
+
+- O ESLint foi ajustado para a série 8.x para manter compatibilidade de peer deps com `@typescript-eslint` v7.
+- O monorepo é padronizado em pnpm via Corepack (sem Yarn) para evitar conflitos de instalação em CI.
 
 ## 🔄 Sincronização convidado -> conta
 
