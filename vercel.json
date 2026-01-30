@@ -1,5 +1,5 @@
 {
-  "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
+  "installCommand": "corepack enable && corepack prepare pnpm@9.12.0 --activate && pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm --filter @gesturial/web build",
   "outputDirectory": "apps/web/.next"
 }
